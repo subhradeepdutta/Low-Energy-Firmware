@@ -24,7 +24,8 @@
 #define OPERATING_FREQ (1000)
 #define NO_OF_SAMPLES (200)
 #define ERROR (0.04)
-
+#define TEMPERATURE_LOWER_LIMIT (0)
+#define TEMPERATURE_UPPER_LIMIT (100)
 
 bool button_pressed = false;
 bool normalmode = false;
@@ -71,7 +72,6 @@ void ADC0_IRQHandler(void)
 			  /*Set boolean flag to true once so that BMA280 enters normal mode after enabling interrupts*/
 			  normalmode = true;
 		  }
-
 		  /*SOUTH*/
 		  else if((ADC_data > SOUTHLOWER && ADC_data < SOUTHUPPER) && (!button_pressed))
 		  {
@@ -86,57 +86,18 @@ void ADC0_IRQHandler(void)
 		  {
 			  button_pressed = true;
 			  swap_threshold();
-			  /*Check and verify if the decreased on time is valid*/
-//			  if(on_period - INCREMENT > ON_TIME - ERROR)
-//			  {
-//				  /*Subtract in increments of 500 mA*/
-//				  on_period = on_period - INCREMENT;
-//				#ifdef EMTHREE
-//				  LETIMER_CompareSet(LETIMER0, 1, (uint16_t)(on_period * ULFRCO_F));
-//				  LETIMER_CompareSet(LETIMER0, 0, (uint16_t)(total_period * ULFRCO_F));
-//				#endif
-//				#ifndef EMTHREE
-//				  LETIMER_CompareSet(LETIMER0, 1, (uint16_t)(on_period * LFXO_F));
-//				  LETIMER_CompareSet(LETIMER0, 0, (uint16_t)(total_period * LFXO_F));
-//				#endif
-//			  }
+			  if(global_temperature - 5 >= TEMPERATURE_LOWER_LIMIT)
+			  		global_temperature = global_temperature - 5;
+
 		  }
 		  /*EAST*/
 		  else if((ADC_data > EASTLOWER && ADC_data < EASTUPPER) && (!button_pressed))
 		  {
 			  button_pressed = true;
 			  swap_threshold();
-			  /*Check and verify if the increased on time is valid*/
-//			  if(on_period + INCREMENT < TOTAL_TIME)
-//			  {
-//				  /*Add in increments of 500 mA*/
-//				  on_period = on_period + INCREMENT;
-//			  #ifdef EMTHREE
-//			  		LETIMER_CompareSet(LETIMER0, 1, (uint16_t)(on_period * ULFRCO_F));
-//			  		LETIMER_CompareSet(LETIMER0, 0, (uint16_t)(total_period * ULFRCO_F));
-//			  #endif
-//			  #ifndef EMTHREE
-//			  		LETIMER_CompareSet(LETIMER0, 1, (uint16_t)(on_period * LFXO_F));
-//			  		LETIMER_CompareSet(LETIMER0, 0, (uint16_t)(total_period * LFXO_F));
-//			  #endif
-//			  }
+			  if(global_temperature + 5 <= TEMPERATURE_UPPER_LIMIT)
+				  global_temperature = global_temperature + 5;
 		  }
-		  /*DEPRESSED*/
-//		  else if((ADC_data < DEPRESSED) && (!button_pressed))
-//		  {
-//			  button_pressed = true;
-//			  swap_threshold();
-//			#ifdef EMTHREE
-//			  ON_period = (uint16_t)ULFRCO_F * ON_TIME;
-//			  TOTAL_period = (uint16_t)ULFRCO_F * TOTAL_TIME;
-//			#endif
-//			#ifndef EMTHREE
-//			  ON_period = (uint16_t)LFXO_F * ON_TIME;
-//			  TOTAL_period = (uint16_t)LFXO_F * TOTAL_TIME;
-//			#endif
-//			  LETIMER_CompareSet(LETIMER0, 0, TOTAL_period);
-//			  LETIMER_CompareSet(LETIMER0, 1, ON_period);
-//		  }
 		  /*DEBOUNCING*/
 		  else if(button_pressed)
 		  {
@@ -144,11 +105,10 @@ void ADC0_IRQHandler(void)
 			 swap_threshold();
 		  }
 		 }
-
 	   CORE_ATOMIC_IRQ_ENABLE();
 	   if(normalmode)
 	  {
-		   /*Enable BMA280 now once global interrupts are back on */
+		  /*Enable BMA280 now once global interrupts are back on */
 		  BMA280_enable();
 		  normalmode = false;
 	  }
