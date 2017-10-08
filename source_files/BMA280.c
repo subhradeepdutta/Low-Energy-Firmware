@@ -9,13 +9,22 @@
 ********************************************************************************/
 #include <BMA280.h>
 
+/*19MHz input from HFRCO
+ * Prescaler = 1024
+ * 18554 Hz Clock input
+ * to Timer 0
+ * Required Delay = 80ms
+ * Value to be loaded = 1480
+ */
+#define BMA_STARTUP_DELAY (0x22)
+
 void BMA280_enable()
 {
 	/* Transition from suspend mode to normal mode*/
 	BMA280_RegisterWrite(USART1, PMU_LPW_REGISTER, DISABLE_SUSPEND);
 	CORE_ATOMIC_IRQ_ENABLE();
 	/*Wait for 1.8 ms*/
-	TIMER0_start();
+	TIMER0_start(BMA_STARTUP_DELAY);
 	sleep();
 	gpio_interrupt_init();
 	GPIO_IntEnable(GPIO_INT_EN_11);

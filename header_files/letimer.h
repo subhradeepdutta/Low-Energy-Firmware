@@ -16,7 +16,7 @@
 
 extern int ON_period, TOTAL_period, Prescaler, CurrentFrequency;
 extern bool I2C_flag;
-extern uint32_t global_temperature;
+extern int32_t global_temperature;
 
 /************************************************************************************
 Name: le_timer_init

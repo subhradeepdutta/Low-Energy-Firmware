@@ -1,21 +1,28 @@
-/*
- * I2C.c
- *
- *  Created on: Oct 4, 2017
- *      Author: subhr
- */
-
-
+/********************************************************************************
+* File ​Name 	  : I2C.c
+* File Description: This file has the function definitions for setting up I2C and
+* 					communicating with the SI7021 sensor
+* Author		  : Subhradeep Dutta
+* Date			  : 10/07/2017
+* Compiler : arm-none-eabi-gcc
+* Linker   : arm-none-eabi-ld
+* Debugger : gdb
+********************************************************************************/
 
 #include "I2C.h"
 
-uint32_t global_temperature = DEFAULT_TEMPERATURE;
+/*Delay of 80 ms needed for the SI7021*/
+#define POWERONRESET_DELAY (0x5C8)
+
+int32_t global_temperature = DEFAULT_TEMPERATURE;
 
 void I2Cinit()
 {
+	/*Turn on PD9 to enable the sensor*/
 	GPIO_PinOutSet(SI7021ENABLE_port, SI7021ENABLE_pin);
-	unsigned long i = 0;
-	for(i=1; i<100000;i++);
+	CORE_ATOMIC_IRQ_ENABLE();
+	TIMER0_start(POWERONRESET_DELAY);
+	sleep();
 
 	I2C_Init_TypeDef i2cInit =
 	{
@@ -52,43 +59,49 @@ void I2Cinit()
 			I2C_IEN_NACK | I2C_IEN_MSTOP | I2C_IEN_ARBLOST | I2C_IEN_BUSERR | I2C_IEN_BUSHOLD |\
 			I2C_IEN_TXOF | I2C_IEN_RXUF | I2C_IEN_BITO | I2C_IEN_CLTO | I2C_IEN_SSTOP | I2C_IEN_RXFULL | \
 			I2C_IEN_CLERR));
-	//I2C_IntEnable(I2C0, (I2C_IEN_ACK | I2C_IEN_NACK));
-	//NVIC_EnableIRQ(I2C0_IRQn);
 
 }
 
 uint16_t I2C_read(uint8_t register_address)
 {
 	uint16_t read_data;
+	/*Load buffer with slave address and write command*/
 	I2C0->TXDATA = ((SI7021_ADDRESS << 1)| WRITE_COMMAND);
+	/*Send start condition*/
 	I2C_start();
 	while((I2C0->IF & I2C_IF_ACK) == 0);
 	I2C0->IFC = I2C_IFC_ACK;
 
+	/*Load buffer with measure temperature command*/
 	I2C0->TXDATA = register_address;
+	/*Send start condition*/
 	I2C_start();
 	while((I2C0->IF & I2C_IF_ACK) == 0);
 	I2C0->IFC = I2C_IFC_ACK;
 
+	/*Load buffer with slave address and read command*/
 	I2C0->TXDATA = ((SI7021_ADDRESS << 1)| READ_COMMAND);
+	/*Send start condition*/
 	I2C_start();
 	while((I2C0->IF & I2C_IF_ACK) == 0);
 	I2C0->IFC = I2C_IFC_ACK;
 
+	/*Wait for conversion to complete and data to be available*/
 	while((I2C0->IF & I2C_IF_RXDATAV ) == 0);
 	read_data = I2C0->RXDATA;
 
+	/*Clear out the bits for the lower byte*/
 	read_data = read_data << 8;
 
 	I2C0->CMD = I2C_CMD_ACK;
+	/*Wait for conversion to complete and data to be available*/
 	while((I2C0->IF & I2C_IF_RXDATAV ) == 0);
 	read_data |= (I2C0->RXDATA)>>2;
 
 	I2C0->CMD = I2C_CMD_NACK;
+	/*Send stop condition*/
 	I2C_stop();
 	return (read_data);
-
-
 }
 
 inline void I2C_start()

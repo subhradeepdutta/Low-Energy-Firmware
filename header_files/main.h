@@ -28,6 +28,6 @@ extern float temperature;
 #define TOTAL_TIME (2.50)
 /*Define the maximum count for the 16 bit LETIMER0*/
 #define LETIMER0_MAX_VAL (65536)
-
+/*The temperature set point is defined in I2C.h*/
 
 #endif

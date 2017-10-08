@@ -118,6 +118,7 @@ int main(void)
 	timer0_init();
 	BMA280_init();
 	BMA280_suspend();
+	I2Cinit();
 
 	while (1)
 	{

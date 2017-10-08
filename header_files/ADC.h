@@ -16,7 +16,7 @@ extern int ON_period, TOTAL_period, Prescaler, CurrentFrequency;
 #include <stdbool.h>
 #include "BMA280.h"
 
-extern uint32_t global_temperature;
+extern int32_t global_temperature;
 
 /************************************************************************************
 Name: swap_threshold

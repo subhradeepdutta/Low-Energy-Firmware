@@ -1,6 +1,6 @@
 /********************************************************************************
 * File ​Name 	  : gpio.h
-* File Description: This file includes the definition of LED0 and GPIO function
+* File Description: This file includes the declaration of LED0 and GPIO function
 * 					prototypes
 * Author		  : Subhradeep Dutta
 * Date			  : 09/13/2017
@@ -67,12 +67,12 @@
 // PC11 SDA pin
 #define	SDA_port gpioPortC
 #define SDA_pin (11)
-#define SDA_default	true 	// off
+#define SDA_default	true 	// true
 
 // PC10 SCL pin
 #define	SCL_port gpioPortC
 #define SCL_pin (10)
-#define SCL_default	true 	// off
+#define SCL_default	true 	// true
 
 #define GPIO_INT_EN_11 0x00000800
 

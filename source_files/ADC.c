@@ -79,6 +79,7 @@ void ADC0_IRQHandler(void)
 			  swap_threshold();
 			  /*Put BMA280 in suspend mode to save power*/
 			  BMA280_suspend();
+			  /*Turn LED1 off*/
 			  GPIO_PinOutClear(LED1_port, LED1_pin);
 		  }
 		  /*WEST*/
@@ -86,8 +87,7 @@ void ADC0_IRQHandler(void)
 		  {
 			  button_pressed = true;
 			  swap_threshold();
-			  if(global_temperature - 5 >= TEMPERATURE_LOWER_LIMIT)
-			  		global_temperature = global_temperature - 5;
+			  global_temperature = global_temperature - 5;
 
 		  }
 		  /*EAST*/
@@ -95,8 +95,7 @@ void ADC0_IRQHandler(void)
 		  {
 			  button_pressed = true;
 			  swap_threshold();
-			  if(global_temperature + 5 <= TEMPERATURE_UPPER_LIMIT)
-				  global_temperature = global_temperature + 5;
+			  global_temperature = global_temperature + 5;
 		  }
 		  /*DEBOUNCING*/
 		  else if(button_pressed)
@@ -177,6 +176,4 @@ void ADC_Initialize()
 	blockSleepMode(energy_mode_3);
 	CORE_ATOMIC_IRQ_ENABLE();
 	NVIC_EnableIRQ(ADC0_IRQn);
-
-
 }

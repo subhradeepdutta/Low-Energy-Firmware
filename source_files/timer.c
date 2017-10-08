@@ -69,10 +69,11 @@ void TIMER0_IRQHandler(void)
 	unblockSleepMode(energy_mode_1);
 	CORE_ATOMIC_IRQ_ENABLE();
 }
-void TIMER0_start()
+void TIMER0_start(uint32_t load_value)
 {
 	blockSleepMode(energy_mode_1);
-	TIMER_TopSet(TIMER0, 0x22);
+	TIMER_TopSet(TIMER0, load_value);
 	TIMER_CounterSet(TIMER0, 0x00);
 	TIMER_Enable(TIMER0, true);
 }
+

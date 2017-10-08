@@ -30,6 +30,6 @@ Description : Reloads the values to the register for reusing TIMER0 even though 
 Inputs: N/A
 Returns N/A
 ************************************************************************************/
-void TIMER0_start();
+void TIMER0_start(uint32_t load_value);
 
 #endif /* INC_TIMER_H_ */

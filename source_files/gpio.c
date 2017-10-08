@@ -62,16 +62,13 @@ GPIO_IntClear(DISABLE_INT11);
 uint8_t dataread = BMA280_RegisterRead(USART1, INT_STATUS_0_REGISTER);
 if(dataread == SINGLE_TAP)
 {
-	//GPIO_PinOutToggle(LED0_port, LED0_pin);
-	I2Cinit();
+
 	I2C_Enable(I2C0, true);
 	I2C_flag = true;
 }
 else if(dataread == DOUBLE_TAP)
 {
-	//GPIO_PinOutToggle(LED1_port, LED1_pin);
 	I2C_Enable(I2C0, false);
-	GPIO_PinOutClear(SI7021ENABLE_port, SI7021ENABLE_pin);
 	I2C_flag = false;
 }
   GPIO_IntEnable(GPIO_INT_EN_11);
